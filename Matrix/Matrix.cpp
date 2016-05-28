@@ -3,14 +3,14 @@
   
   Autor: Roland Völker
   eMail: roland_voelker@web.de
-  Datum: 2016-05-27
+  Datum: 2016-05-28
+  Version: 2
   
   (c) Alle Rechte vorbehalten.
 */
 
 
 #include "Matrix.h"
-#include <iostream>
 
 
 namespace VMath
@@ -26,19 +26,19 @@ Matrix::Matrix(int m, int n) {
 }
 
 
-Matrix::Matrix(double* matrix, int m, int n) {
-  setMatrix(matrix, m, n);
+Matrix::Matrix(double* data, int m, int n) {
+  setMatrix(data, m, n);
 }
 
 
 Matrix::Matrix(Matrix const& m) {
-  setMatrix(m.matrix, m.m, m.n);
+  setMatrix(m.data, m.m, m.n);
 }
 
 
 Matrix::~Matrix() {
-  if (this->matrix != nullptr)
-    delete[] matrix;
+  if (data != nullptr)
+    delete[] data;
 }
 
 
@@ -58,7 +58,7 @@ int Matrix::getCols() const {
 double* Matrix::getMatrix() const {
   double* res = new double[m*n];
   for (int i = 0; i < m*n; i++) {
-    res[i] = matrix[i];
+    res[i] = data[i];
   }
   
   return res;
@@ -66,15 +66,15 @@ double* Matrix::getMatrix() const {
 
 
 void Matrix::setMatrix(int m, int n) {
-  if (this->matrix != nullptr)
-    delete[] matrix;
+  if (data != nullptr)
+    delete[] data;
 
   this->m = m;
   this->n = n;
-  this->matrix = new double[m*n];
+  data = new double[m*n];
   
   for (int i = 0; i < m*n; i++) {
-    this->matrix[i] = 0;
+    data[i] = 0;
   }
 }
 
@@ -82,37 +82,47 @@ void Matrix::setMatrix(int m, int n) {
 /*
   Legt eine normale tiefe Kopie vom angegebenen Array an.
 */
-void Matrix::setMatrix(double* matrix, int m, int n) {
-  if (this->matrix != nullptr)
-    delete[] matrix;
+void Matrix::setMatrix(double* data, int m, int n) {
+  if (this->data != nullptr)
+    delete[] data;
 
   this->m = m;
   this->n = n;
-  this->matrix = new double[m*n];
+  this->data = new double[m*n];
   
   for (int i = 0; i < m*n; i++) {
-    this->matrix[i] = matrix[i];
+    this->data[i] = data[i];
   }
 }
 
 
 void Matrix::set(int i, int j, double d) {
-  this->matrix[i*n+j] = d;
+  data[i*n+j] = d;
 }
 
 
 void Matrix::set(int i, double d) {
-  this->matrix[i] = d;
+  data[i] = d;
 }
 
 
 double Matrix::operator[](int i) const {
-  return matrix[i];
+  return data[i];
 }
 
 
 double Matrix::operator()(int i, int j) const {
-  return matrix[i*n + j];
+  return data[i*n + j];
+}
+
+
+Matrix& Matrix::operator=(Matrix const& m) {
+  if (data != nullptr)
+    delete[] data;
+    
+  setMatrix(m.data, m.m, m.n);
+  
+  return *this;
 }
 
 
@@ -140,16 +150,6 @@ Matrix& Matrix::operator*=(double d) {
 }
 
 
-Matrix& Matrix::operator=(Matrix const& m) {
-  if (this->matrix != nullptr)
-    delete[] matrix;
-    
-  setMatrix(m.matrix, m.m, m.n);
-  
-  return *this;
-}
-
-
 ////////////////////////
 // Globale Operatoren //
 ////////////////////////
@@ -161,13 +161,13 @@ Matrix operator+(Matrix const& m1, Matrix const& m2) {
     throw DIMENSION_EXCEPTION;
    
   int len = m1.m * m1.n;
-  double* matrix = new double[len];
+  double* data = new double[len];
    
   for (int i = 0; i < len; i++) {
-    matrix[i] = m1[i] + m2[i];
+    data[i] = m1[i] + m2[i];
   }
   
-  return Matrix(matrix, m1.m, m1.n);
+  return Matrix(data, m1.m, m1.n);
 }
 
 
@@ -180,24 +180,24 @@ Matrix operator-(Matrix const& m1, Matrix const& m2) {
     throw DIMENSION_EXCEPTION;
    
   int len = m1.m * m1.n;
-  double* matrix = new double[len];
+  double* data = new double[len];
    
   for (int i = 0; i < len; i++) {
-    matrix[i] = m1[i] - m2[i];
+    data[i] = m1[i] - m2[i];
   }
   
-  return Matrix(matrix, m1.m, m1.n);
+  return Matrix(data, m1.m, m1.n);
 }
 
 
 Matrix operator-(Matrix const& m) {
   int len = m.m * m.n;
-  double* matrix = new double[len];
+  double* data = new double[len];
   for (int i = 0; i < len; i++) {
-    matrix[i] = -m[i];
+    data[i] = -m[i];
   }
   
-  return Matrix(matrix, m.m, m.n);
+  return Matrix(data, m.m, m.n);
 }
 
 
@@ -205,7 +205,7 @@ Matrix operator*(Matrix const& m1, Matrix const& m2) {
   if (m1.n != m2.m)
     throw DIMENSION_EXCEPTION;
   
-  double* matrix = new double[m1.m*m2.n];
+  double* data = new double[m1.m*m2.n];
   
   for (int i = 0; i < m1.m; i++) {
     for (int j = 0; j < m2.n; j++) {
@@ -213,33 +213,33 @@ Matrix operator*(Matrix const& m1, Matrix const& m2) {
       for (int k = 0; k < m1.n; k++) {
         sum += m1(i, k) * m2(k, j);
       }
-      matrix[i*m2.n+j] = sum;
+      data[i*m2.n+j] = sum;
     }
   }
   
-  return Matrix(matrix, m1.m, m2.n);
+  return Matrix(data, m1.m, m2.n);
 }
 
 
 Matrix operator*(Matrix const& m, double d) {
   int len = m.m * m.n;
-  double* matrix = new double[len];
+  double* data = new double[len];
   for (int i = 0; i < len; i++) {
-    matrix[i] = d * m[i];
+    data[i] = d * m[i];
   }
   
-  return Matrix(matrix, m.m, m.n);
+  return Matrix(data, m.m, m.n);
 }
 
 
 Matrix operator*(double d, Matrix const& m) {
   int len = m.m * m.n;
-  double* matrix = new double[len];
+  double* data = new double[len];
   for (int i = 0; i < len; i++) {
-    matrix[i] = d * m[i];
+    data[i] = d * m[i];
   }
   
-  return Matrix(matrix, m.m, m.n);
+  return Matrix(data, m.m, m.n);
 }
 
 
@@ -260,5 +260,4 @@ std::ostream& operator<<(std::ostream& os, Matrix const& m) {
 }
 
 };
-
 

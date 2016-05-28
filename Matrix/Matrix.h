@@ -3,7 +3,8 @@
   
   Autor: Roland Völker
   eMail: roland_voelker@web.de
-  Datum: 2016-05-27
+  Datum: 2016-05-28
+  Version: 2
   
   (c) Alle Rechte vorbehalten.
 */
@@ -86,7 +87,7 @@ private:
   int n; // Spalten
   
   // Matrixeinträge
-  double* matrix = nullptr;
+  double* data = nullptr;
 };
 
 // Folgende Operatoren sind direkt aus der
