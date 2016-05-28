@@ -1,6 +1,6 @@
-# GaussCode
+# Cpp_Math
 
-Das Projekt "GaussCode" ist nur zu Sammlungszwecken gedacht und beinhaltet
+Das Projekt "Cpp_Math" ist nur zu Sammlungszwecken gedacht und beinhaltet
 nichts weiter als ein paar wichtige mathematische Objekte und Algorithmen.
 
 Ich will damit vermeiden, den selben Code immer wieder zu schreiben, zum
