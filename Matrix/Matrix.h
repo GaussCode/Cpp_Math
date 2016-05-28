@@ -15,7 +15,7 @@
 #define DIMENSION_EXCEPTION 1
 
 /*
-  Matrix im Row-First-Format. Datei enthält ansonsten sämtliche
+  Matrix im Row-Major-Format. Datei enthält ansonsten sämtliche
   sinnvolle Operatoren (intern und extern bzw. global).
 */
 class Matrix {
