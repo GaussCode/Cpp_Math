@@ -12,6 +12,9 @@
 #include "Matrix.h"
 #include <iostream>
 
+namespace VMath
+{
+
 Matrix::Matrix() {
   setMatrix(0, 0);
 }
@@ -146,19 +149,6 @@ Matrix& Matrix::operator=(Matrix const& m) {
 }
 
 
-/*
-  Gibt die Matrix mit Leerzeichen als Trennzeichen aus.
-*/
-void Matrix::out() const {
-  for (int i = 0; i < m; i++) {
-    for (int j = 0; j < n; j++) {
-      std::cout << (*this)(i, j) << " ";
-    }
-    std::cout << std::endl;
-  }
-}
-
-
 ////////////////////////
 // Globale Operatoren //
 ////////////////////////
@@ -166,17 +156,17 @@ void Matrix::out() const {
 
 Matrix operator+(Matrix const& m1, Matrix const& m2) {
   // Reihen oder Spalten stimmen nicht überein
-  if (m1.getRows() != m2.getRows() || m1.getCols() != m2.getCols())
+  if (m1.m != m2.n || m1.m != m2.n)
     throw DIMENSION_EXCEPTION;
    
-  int len = m1.getRows() * m1.getCols();
+  int len = m1.m * m1.n;
   double* matrix = new double[len];
    
   for (int i = 0; i < len; i++) {
     matrix[i] = m1[i] + m2[i];
   }
   
-  return Matrix(matrix, m1.getRows(), m1.getCols());
+  return Matrix(matrix, m1.m, m1.n);
 }
 
 
@@ -185,69 +175,89 @@ Matrix operator+(Matrix const& m1, Matrix const& m2) {
   in der Schleife wurde zu einem "-" geändert.
 */
 Matrix operator-(Matrix const& m1, Matrix const& m2) {
-  if (m1.getRows() != m2.getRows() || m1.getCols() != m2.getCols())
+  if (m1.m != m2.m || m1.n != m2.n)
     throw DIMENSION_EXCEPTION;
    
-  int len = m1.getRows() * m1.getCols();
+  int len = m1.m * m1.n;
   double* matrix = new double[len];
    
   for (int i = 0; i < len; i++) {
     matrix[i] = m1[i] - m2[i];
   }
   
-  return Matrix(matrix, m1.getRows(), m1.getCols());
+  return Matrix(matrix, m1.m, m1.n);
 }
 
 
 Matrix operator-(Matrix const& m) {
-  int len = m.getRows() * m.getCols();
+  int len = m.m * m.n;
   double* matrix = new double[len];
   for (int i = 0; i < len; i++) {
     matrix[i] = -m[i];
   }
   
-  return Matrix(matrix, m.getRows(), m.getCols());
+  return Matrix(matrix, m.m, m.n);
 }
 
 
 Matrix operator*(Matrix const& m1, Matrix const& m2) {
-  if (m1.getCols() != m2.getRows())
+  if (m1.n != m2.m)
     throw DIMENSION_EXCEPTION;
   
-  double* matrix = new double[m1.getRows()*m2.getCols()];
+  double* matrix = new double[m1.m*m2.n];
   
-  for (int i = 0; i < m1.getRows(); i++) {
-    for (int j = 0; j < m2.getCols(); j++) {
+  for (int i = 0; i < m1.m; i++) {
+    for (int j = 0; j < m2.n; j++) {
       double sum = 0;
-      for (int k = 0; k < m1.getCols(); k++) {
+      for (int k = 0; k < m1.n; k++) {
         sum += m1(i, k) * m2(k, j);
       }
-      matrix[i*m2.getCols()+j] = sum;
+      matrix[i*m2.n+j] = sum;
     }
   }
   
-  return Matrix(matrix, m1.getRows(), m2.getCols());
+  return Matrix(matrix, m1.m, m2.n);
 }
 
 
 Matrix operator*(Matrix const& m, double d) {
-  int len = m.getRows() * m.getCols();
+  int len = m.m * m.n;
   double* matrix = new double[len];
   for (int i = 0; i < len; i++) {
     matrix[i] = d * m[i];
   }
   
-  return Matrix(matrix, m.getRows(), m.getCols());
+  return Matrix(matrix, m.m, m.n);
 }
 
 
 Matrix operator*(double d, Matrix const& m) {
-  int len = m.getRows() * m.getCols();
+  int len = m.m * m.n;
   double* matrix = new double[len];
   for (int i = 0; i < len; i++) {
     matrix[i] = d * m[i];
   }
   
-  return Matrix(matrix, m.getRows(), m.getCols());
+  return Matrix(matrix, m.m, m.n);
 }
+
+
+/*
+  Gibt die Matrix mit Leerzeichen als Trennzeichen aus.
+*/
+std::ostream& operator<<(std::ostream& os, Matrix const& m) {
+  for (int i = 0; i < m.m; i++) {
+    for (int j = 0; j < m.n; j++) {
+      os << m(i, j) << " ";
+    }
+    
+    // Einen abschließenden Zeilenumbruch gibt es nicht
+    if (i < m.m-1) os << "\n";
+  }
+  
+  return os;
+}
+
+};
+
 
