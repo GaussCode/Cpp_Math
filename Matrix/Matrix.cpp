@@ -84,7 +84,7 @@ void Matrix::setMatrix(int m, int n) {
 */
 void Matrix::setMatrix(double* data, int m, int n) {
   if (this->data != nullptr)
-    delete[] data;
+    delete[] this->data;
 
   this->m = m;
   this->n = n;
